@@ -715,6 +715,7 @@ EOF;
 		}
 		// Delete shipped apps
 		$shippedApps = json_decode(file_get_contents($shippedAppsFile), true);
+		$shippedApps[] = 'example-theme';
 		foreach($shippedApps['shippedApps'] as $app) {
 			$this->recursiveDelete($this->baseDir . '/../apps/' . $app);
 		}
