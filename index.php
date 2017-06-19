@@ -634,7 +634,12 @@ EOF;
 		$downloadedVersion = $this->getVersionByVersionFile(dirname($downloadedFilePath) . '/nextcloud/version.php');
 		$currentVersion = $this->getVersionByVersionFile($this->baseDir . '/../version.php');
 		if(version_compare($downloadedVersion, $currentVersion, '<')) {
-			throw new \Exception('Downloaded version is lower than installed version');
+			// If the version is not lower, only the same major and minor are allowed
+			$downloadedVersionSplit = explode('.', $downloadedVersion);
+			$currentVersionSplit = explode('.', $currentVersion);
+			if ($currentVersionSplit[0] !== $downloadedVersionSplit[0] || $currentVersionSplit[1] !== $downloadedVersionSplit[1]) {
+				throw new \Exception('Downloaded version is lower than installed version');
+			}
 		}
 
 		$this->silentLog('[info] end of extractDownload()');
