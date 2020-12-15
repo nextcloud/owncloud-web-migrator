@@ -203,7 +203,9 @@ class Updater {
 			'..',
 			// Folders
 			'3rdparty',
+			'ocm-provider',
 			'apps',
+			'apps-external',
 			'config',
 			'core',
 			'data',
@@ -232,6 +234,7 @@ class Updater {
 			'CHANGELOG.md',
 			'COPYING',
 			'COPYING-AGPL',
+			'README.md',
 			'occ',
 			'db_structure.xml',
 		];
