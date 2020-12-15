@@ -241,6 +241,25 @@ class Updater {
 	}
 
 	/**
+	 * Returns app directories specified in config.php
+	 *
+	 * @return array
+	 */
+	private function getAppDirectories() {
+		$expected = [];
+		if($appsPaths = $this->getConfigOption('apps_paths')) {
+			foreach ($appsPaths as $appsPath) {
+				$parentDir = realpath($this->baseDir . '/../');
+				$appDir = basename($appsPath['path']);
+				if(strpos($appsPath['path'], $parentDir) === 0 && $appDir !== 'apps') {
+					$expected[] = $appDir;
+				}
+			}
+		}
+		return $expected;
+	}
+
+	/**
 	 * Gets the recursive directory iterator over the Nextcloud folder
 	 *
 	 * @param string $folder
@@ -763,6 +782,8 @@ EOF;
 			'apps',
 			'updater',
 		];
+
+		$excludedElements = array_merge($excludedElements, $this->getAppDirectories());
 		/**
 		 * @var string $path
 		 * @var \SplFileInfo $fileInfo
