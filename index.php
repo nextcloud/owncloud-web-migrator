@@ -476,7 +476,10 @@ class Updater {
 
 		$fp = fopen($storageLocation . basename($response['url']), 'w+');
 		$ch = curl_init($response['url']);
-		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt_array($ch, [
+			CURLOPT_FILE => $fp,
+			CURLOPT_USERAGENT => 'Nextcloud Updater',
+		]);
 		if(curl_exec($ch) === false) {
 			throw new \Exception('Curl error: ' . curl_error($ch));
 		}
