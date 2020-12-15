@@ -259,6 +259,58 @@ class Updater {
 		return $expected;
 	}
 
+	private function getOwnCloudApps() {
+		return [
+		  'activity',
+		  'federatedfilesharing',
+		  'files_pdfviewer',
+		  'oauth2',
+		  'updatenotification',
+		  'admin_audit',
+		  'federation',
+		  'files_sharing',
+		  'password_policy',
+		  'user_external',
+		  'announcementcenter',
+		  'files',
+		  'files_texteditor',
+		  'provisioning_api',
+		  'user_ldap',
+		  'comments',
+		  'files_antivirus',
+		  'files_trashbin',
+		  'ransomware_protection',
+		  'user_shibboleth',
+		  'configreport',
+		  'files_classifier',
+		  'files_versions',
+		  'sharepoint',
+		  'windows_network_drive',
+		  'customgroups',
+		  'files_external',
+		  'firewall',
+		  'systemtags',
+		  'wopi',
+		  'dav',
+		  'files_external_dropbox',
+		  'firstrunwizard',
+		  'systemtags_management',
+		  'workflow',
+		  'encryption',
+		  'files_external_ftp',
+		  'guests',
+		  'templateeditor',
+		  'enterprise_key',
+		  'files_ldap_home',
+		  'market',
+		  'theme-enterprise',
+		  'external',
+		  'files_mediaviewer',
+		  'notifications',
+		  'twofactor_totp',
+		];
+	}
+
 	/**
 	 * Gets the recursive directory iterator over the Nextcloud folder
 	 *
@@ -740,6 +792,7 @@ EOF;
 		}
 		// Delete shipped apps
 		$shippedApps = json_decode(file_get_contents($shippedAppsFile), true);
+		$shippedApps['shippedApps'] = array_merge($shippedApps['shippedApps'], $this->getOwnCloudApps());
 		$shippedApps['shippedApps'][] = 'example-theme';
 		foreach($shippedApps['shippedApps'] as $app) {
 			$this->recursiveDelete($this->baseDir . '/../apps/' . $app);
