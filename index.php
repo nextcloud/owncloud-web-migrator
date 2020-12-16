@@ -203,7 +203,9 @@ class Updater {
 			'..',
 			// Folders
 			'3rdparty',
+			'ocm-provider',
 			'apps',
+			'apps-external',
 			'config',
 			'core',
 			'data',
@@ -232,8 +234,80 @@ class Updater {
 			'CHANGELOG.md',
 			'COPYING',
 			'COPYING-AGPL',
+			'README.md',
 			'occ',
 			'db_structure.xml',
+		];
+	}
+
+	/**
+	 * Returns app directories specified in config.php
+	 *
+	 * @return array
+	 */
+	private function getAppDirectories() {
+		$expected = [];
+		if($appsPaths = $this->getConfigOption('apps_paths')) {
+			foreach ($appsPaths as $appsPath) {
+				$parentDir = realpath($this->baseDir . '/../');
+				$appDir = basename($appsPath['path']);
+				if(strpos($appsPath['path'], $parentDir) === 0 && $appDir !== 'apps') {
+					$expected[] = $appDir;
+				}
+			}
+		}
+		return $expected;
+	}
+
+	private function getOwnCloudApps() {
+		return [
+		  'activity',
+		  'federatedfilesharing',
+		  'files_pdfviewer',
+		  'oauth2',
+		  'updatenotification',
+		  'admin_audit',
+		  'federation',
+		  'files_sharing',
+		  'password_policy',
+		  'user_external',
+		  'announcementcenter',
+		  'files',
+		  'files_texteditor',
+		  'provisioning_api',
+		  'user_ldap',
+		  'comments',
+		  'files_antivirus',
+		  'files_trashbin',
+		  'ransomware_protection',
+		  'user_shibboleth',
+		  'configreport',
+		  'files_classifier',
+		  'files_versions',
+		  'sharepoint',
+		  'windows_network_drive',
+		  'customgroups',
+		  'files_external',
+		  'firewall',
+		  'systemtags',
+		  'wopi',
+		  'dav',
+		  'files_external_dropbox',
+		  'firstrunwizard',
+		  'systemtags_management',
+		  'workflow',
+		  'encryption',
+		  'files_external_ftp',
+		  'guests',
+		  'templateeditor',
+		  'enterprise_key',
+		  'files_ldap_home',
+		  'market',
+		  'theme-enterprise',
+		  'external',
+		  'files_mediaviewer',
+		  'notifications',
+		  'twofactor_totp',
 		];
 	}
 
@@ -473,7 +547,10 @@ class Updater {
 
 		$fp = fopen($storageLocation . basename($response['url']), 'w+');
 		$ch = curl_init($response['url']);
-		curl_setopt($ch, CURLOPT_FILE, $fp);
+		curl_setopt_array($ch, [
+			CURLOPT_FILE => $fp,
+			CURLOPT_USERAGENT => 'Nextcloud Updater',
+		]);
 		if(curl_exec($ch) === false) {
 			throw new \Exception('Curl error: ' . curl_error($ch));
 		}
@@ -715,7 +792,8 @@ EOF;
 		}
 		// Delete shipped apps
 		$shippedApps = json_decode(file_get_contents($shippedAppsFile), true);
-		$shippedApps['shippedApps'][] = 'example-theme';
+		$shippedApps['shippedApps'] = array_merge($shippedApps['shippedApps'], $this->getOwnCloudApps());
+		$shippedApps['shippedApps'][] = 'example-theme';
 		foreach($shippedApps['shippedApps'] as $app) {
 			$this->recursiveDelete($this->baseDir . '/../apps/' . $app);
 		}
@@ -757,6 +835,8 @@ EOF;
 			'apps',
 			'updater',
 		];
+
+		$excludedElements = array_merge($excludedElements, $this->getAppDirectories());
 		/**
 		 * @var string $path
 		 * @var \SplFileInfo $fileInfo
